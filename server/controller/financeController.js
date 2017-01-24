@@ -53,4 +53,18 @@ function getFinanceData(req,res){
        })
 }
 
-module.exports = getFinanceData;
+function tickerSearch(req,res){
+  let searchWorld = req.query.search;
+  myapi.ticker(searchWorld)
+  .then(function(data) {
+    res.status(500).json(data);
+  })
+  .catch((err)=>{
+    res.status(500).send(err);
+  })
+}
+
+module.exports = {
+  getFinanceData,
+  tickerSearch
+}
