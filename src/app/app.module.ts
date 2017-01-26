@@ -3,6 +3,8 @@ import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 
+import { ChartModule } from 'angular2-chartjs';
+
 import { AppComponent } from './app.component';
 import { ChartComponent } from './chart/chart.component';
 
@@ -14,7 +16,8 @@ import { ChartComponent } from './chart/chart.component';
   imports: [
     BrowserModule,
     FormsModule,
-    HttpModule
+    HttpModule,
+    ChartModule
   ],
   providers: [],
   bootstrap: [AppComponent]

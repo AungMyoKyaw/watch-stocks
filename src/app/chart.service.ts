@@ -4,7 +4,7 @@ import 'rxjs/add/operator/map';
 
 @Injectable()
 export class ChartService {
-  recentStock:string[];
+  recentStock:any;
 
   constructor(private http:Http) { }
 
@@ -14,17 +14,36 @@ export class ChartService {
                     .map(res=>res.json());
   }
 
-  recentStockSym(){
-    this.recentStock = JSON.parse(localStorage.getItem('recent_stock'));
+  getrecentStockSym(){
+    this.recentStock = localStorage.getItem('recent_stock');
+    if(this.recentStock!==undefined){
+      this.recentStock = ['goog','aapl','fb','msft'];
+    } else {
+      this.recentStock = JSON.parse(this.recentStock);
+    }
+    console.log(this.recentStock)
     return this.recentStock;
   }
 
   addToRecentStockSym(sym:string){
-    this.recentStock = JSON.parse(localStorage.getItem('recent_stock')) || [];
+    this.recentStock = localStorage.getItem('recent_stock');
+    if(this.recentStock!==undefined){
+      this.recentStock = [];
+    } else {
+      this.recentStock = JSON.parse(this.recentStock);
+    }
     this.recentStock.push(sym);
     localStorage.setItem('recent_stock',JSON.stringify(this.recentStock));
     return JSON.parse(localStorage.getItem('recent_stock'));
   }
 
+  randomColor(){
+    let color = [0,1,2,3,4,5,6,7,8,9,'A','B','C','D','E','F'];
+    let toReturn = '#';
+    for(let i=0;i<6;i++){
+      toReturn+=color[Math.round(9*Math.random())]
+    }
+    return toReturn;
+  }
 
 }
