@@ -18,11 +18,13 @@ export class ChartComponent implements OnInit {
     maintainAspectRatio: false
   };
 
+  period:string = 'tm';
+
   constructor(private chartService:ChartService) { }
 
   ngOnInit() {
     this.recentStock = this.chartService.getrecentStockSym();
-    this.getStockData(this.recentStock,'tm');
+    this.getStockData(this.recentStock,this.period);
   }
 
   getStockData(recentStock:string[],period:string){
@@ -58,5 +60,38 @@ export class ChartComponent implements OnInit {
             console.log(error)
           });
     });
+  }
+
+  addToChart(stockSym:string){
+    this.chartService.addToRecentStockSym(stockSym);
+    this.chartService.stockData(stockSym,this.period)
+        .subscribe(result=>{
+          let tempDataList = [];
+          let tempLabalNameList = [];
+          result.data.forEach(elem=>{
+            tempDataList.push(Number(elem.Adj_Close));
+             tempLabalNameList.push(elem.Date)
+          });
+          this.datasetsList.push({
+            "label":stockSym,
+            "data":tempDataList.reverse(),
+            "fill":false,
+            "borderColor":this.chartService.randomColor(),
+            "backgroundColor":this.chartService.randomColor(),
+            "pointRadius":2
+          });
+          this.labalNameList = tempLabalNameList.reverse();
+          this.data = {
+            labels: this.labalNameList,
+            datasets: this.datasetsList
+          };
+        },
+        error=>{
+          console.log(error);
+        })
+  }
+
+  removeFromChart(sym:string){
+    console.log(sym)
   }
 }

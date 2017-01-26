@@ -16,18 +16,18 @@ export class ChartService {
 
   getrecentStockSym(){
     this.recentStock = localStorage.getItem('recent_stock');
-    if(this.recentStock!==undefined){
+    if(this.recentStock==undefined){
       this.recentStock = ['goog','aapl','fb','msft'];
+      localStorage.setItem('recent_stock',JSON.stringify(this.recentStock));
     } else {
       this.recentStock = JSON.parse(this.recentStock);
     }
-    console.log(this.recentStock)
     return this.recentStock;
   }
 
   addToRecentStockSym(sym:string){
     this.recentStock = localStorage.getItem('recent_stock');
-    if(this.recentStock!==undefined){
+    if(this.recentStock==undefined){
       this.recentStock = [];
     } else {
       this.recentStock = JSON.parse(this.recentStock);

@@ -1,1 +1,9 @@
 <chart [type]="type" [data]="data" [options]="options" style="height:25em"></chart>
+<div *ngFor="let stock of recentStock">
+  {{stock}}
+  <span (click)="removeFromChart(stock)">x</span>
+</div>
+<form>
+  <input #stockSym type="text" (keyup.enter)="addToChart(stockSym.value)">
+  <button (click)="addToChart(stockSym.value)">Button</button>
+</form>
