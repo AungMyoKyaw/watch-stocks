@@ -1,0 +1,16 @@
+#delete{
+  float: right;
+  margin-right: 1em;
+  cursor:pointer;
+  opacity: .4;
+}
+#delete:hover{
+  opacity: 1;
+}
+.recentStockList{
+  border-left: .4em solid red;
+  border-right: .1em solid red;
+  border-top: .1em solid red;
+  border-bottom: .1em solid red;
+  margin:.3em;
+}

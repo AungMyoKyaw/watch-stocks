@@ -17,7 +17,7 @@ export class ChartService {
   getrecentStockSym(){
     this.recentStock = localStorage.getItem('recent_stock');
     if(this.recentStock==undefined){
-      this.recentStock = ['goog','aapl','fb','msft'];
+      this.recentStock = ['aapl','fb'];
       localStorage.setItem('recent_stock',JSON.stringify(this.recentStock));
     } else {
       this.recentStock = JSON.parse(this.recentStock);

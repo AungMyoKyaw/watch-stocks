@@ -1,9 +1,20 @@
-<chart [type]="type" [data]="data" [options]="options" style="height:25em"></chart>
-<div *ngFor="let stock of recentStock">
-  {{stock}}
-  <span (click)="removeFromChart(stock)">x</span>
+<div class="container">
+  <div class="row">
+    <chart [type]="type" [data]="data" [options]="options" style="height:40em"></chart>
+  </div>
+  <form>
+    <div class="form-group">
+      <input #stockSym type="text" (keyup.enter)="addToChart(stockSym.value)" class="form-control" placeholder="Enter Stock Symbol">
+    </div>
+  </form>
+  <div class="row">
+    <div *ngFor="let stock of recentStock" class="col-sm-4">
+      <div class="recentStockList">
+        <h2 class="text-center text-info">
+          {{stock}}
+          <div (click)="removeFromChart(stock)" class="text-danger" id="delete">X</div>
+        </h2>
+      </div>
+    </div>
+  </div>
 </div>
-<form>
-  <input #stockSym type="text" (keyup.enter)="addToChart(stockSym.value)">
-  <button (click)="addToChart(stockSym.value)">Button</button>
-</form>

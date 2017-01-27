@@ -64,6 +64,7 @@ export class ChartComponent implements OnInit {
 
   addToChart(stockSym:string){
     this.chartService.addToRecentStockSym(stockSym);
+    this.recentStock.push(stockSym);
     this.chartService.stockData(stockSym,this.period)
         .subscribe(result=>{
           let tempDataList = [];
@@ -92,6 +93,11 @@ export class ChartComponent implements OnInit {
   }
 
   removeFromChart(sym:string){
-    console.log(sym)
+    let itemIndex = this.recentStock.indexOf(sym);
+    if(itemIndex>-1){
+      this.recentStock.splice(itemIndex,1);
+      localStorage.setItem('recent_stock',JSON.stringify(this.recentStock));
+    }
+    this.getStockData(this.recentStock,this.period);
   }
 }
