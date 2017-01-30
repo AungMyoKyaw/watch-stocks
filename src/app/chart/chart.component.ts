@@ -25,7 +25,18 @@ export class ChartComponent implements OnInit {
 
   ngOnInit() {
     this.recentStock = this.chartService.getrecentStockSym();
-    this.getStockData(this.recentStock,this.period);
+    if(this.recentStock.length){
+      this.getStockData(this.recentStock,this.period);
+    } else {
+      this.chartMessage = 'No recent stock chart to display!';
+      this.labalNameList = []
+      this.data = {
+        labels: [],
+        datasets: []
+      };
+      this.datasetsList = [];
+      this.labalNameList = [];
+    }
   }
 
   getStockData(recentStock:string[],period:string){
@@ -33,44 +44,49 @@ export class ChartComponent implements OnInit {
     let tempLabalNameList = [];
     this.datasetsList = [];
     this.labalNameList = [];
-    this.chartMessage = 'Loading';
-    recentStock.forEach((element,i)=>{
-      this.chartService.stockData(element,period)
-          .subscribe(result=>{
-             tempDataList = [];
-               result.data.forEach(elem=>{
-                 tempDataList.push(Number(elem.Adj_Close));
-                 if(i==0){
-                  tempLabalNameList.push(elem.Date)
-                 }
-                 if(i==recentStock.length-1){
-                   this.chartMessage = '';
-                 }
-             });
-             this.datasetsList.push({
-               "label":element,
-               "data":tempDataList.reverse(),
-               "fill":false,
-               "borderColor":this.chartService.randomColor(),
-               "backgroundColor":this.chartService.randomColor(),
-               "pointRadius":2
-             });
-             this.labalNameList = tempLabalNameList.reverse();
-             this.data = {
-               labels: this.labalNameList,
-               datasets: this.datasetsList
-             };
-          },
-          error=>{
-            this.chartMessage = 'Error on displaying chart.\n Please refresh Browser';
-            console.log(error)
-          });
-    });
+    if(recentStock.length){
+      this.chartMessage = 'Loading';
+      recentStock.forEach((element,i)=>{
+        this.chartService.stockData(element,period)
+            .subscribe(result=>{
+               tempDataList = [];
+                 result.data.forEach(elem=>{
+                   tempDataList.push(Number(elem.Adj_Close));
+                   if(i==0){
+                    tempLabalNameList.push(elem.Date)
+                   }
+                   if(i==recentStock.length-1){
+                     this.chartMessage = '';
+                   }
+               });
+               this.datasetsList.push({
+                 "label":element,
+                 "data":tempDataList.reverse(),
+                 "fill":false,
+                 "borderColor":this.chartService.randomColor(),
+                 "pointRadius":2,
+                 "borderWidth":4
+               });
+               this.labalNameList = tempLabalNameList.reverse();
+               this.data = {
+                 labels: this.labalNameList,
+                 datasets: this.datasetsList
+               };
+            },
+            error=>{
+              this.chartMessage = 'Error on displaying chart.\n Please refresh Browser';
+              console.log(error)
+            });
+      });
+    } else {
+      this.chartMessage = 'No recent stock chart to display!';
+      this.labalNameList = [];
+      this.data = {};
+    }
+
   }
 
   addToChart(stockSym:string){
-    this.chartService.addToRecentStockSym(stockSym);
-    this.recentStock.push(stockSym);
     this.chartMessage = 'Loading';
     this.chartService.stockData(stockSym,this.period)
         .subscribe(result=>{
@@ -85,14 +101,16 @@ export class ChartComponent implements OnInit {
             "data":tempDataList.reverse(),
             "fill":false,
             "borderColor":this.chartService.randomColor(),
-            "backgroundColor":this.chartService.randomColor(),
-            "pointRadius":2
+            "pointRadius":2,
+            "borderWidth":4
           });
           this.labalNameList = tempLabalNameList.reverse();
           this.data = {
             labels: this.labalNameList,
             datasets: this.datasetsList
           };
+          this.chartService.addToRecentStockSym(stockSym);
+          this.recentStock.push(stockSym);
           this.chartMessage = '';
         },
         error=>{
@@ -107,8 +125,19 @@ export class ChartComponent implements OnInit {
       this.recentStock.splice(itemIndex,1);
       localStorage.setItem('recent_stock',JSON.stringify(this.recentStock));
     }
-    this.chartMessage = 'Loading';
-    this.getStockData(this.recentStock,this.period);
+    if(this.recentStock.length){
+      this.chartMessage = 'Loading';
+      this.getStockData(this.recentStock,this.period);
+    } else {
+      this.chartMessage = 'No recent stock chart to display!';
+      this.labalNameList = []
+      this.data = {
+        labels: [],
+        datasets: []
+      };
+      this.datasetsList = [];
+      this.labalNameList = [];
+    }
   }
 
   changePeriod(event:any){
