@@ -19,6 +19,7 @@ export class ChartComponent implements OnInit {
   };
 
   period:string = 'tm';
+  chartMessage:string = '';
 
   constructor(private chartService:ChartService) { }
 
@@ -32,6 +33,7 @@ export class ChartComponent implements OnInit {
     let tempLabalNameList = [];
     this.datasetsList = [];
     this.labalNameList = [];
+    this.chartMessage = 'Loading';
     recentStock.forEach((element,i)=>{
       this.chartService.stockData(element,period)
           .subscribe(result=>{
@@ -40,6 +42,9 @@ export class ChartComponent implements OnInit {
                  tempDataList.push(Number(elem.Adj_Close));
                  if(i==0){
                   tempLabalNameList.push(elem.Date)
+                 }
+                 if(i==recentStock.length-1){
+                   this.chartMessage = '';
                  }
              });
              this.datasetsList.push({
@@ -57,6 +62,7 @@ export class ChartComponent implements OnInit {
              };
           },
           error=>{
+            this.chartMessage = 'Error on displaying chart.\n Please refresh Browser';
             console.log(error)
           });
     });
@@ -65,6 +71,7 @@ export class ChartComponent implements OnInit {
   addToChart(stockSym:string){
     this.chartService.addToRecentStockSym(stockSym);
     this.recentStock.push(stockSym);
+    this.chartMessage = 'Loading';
     this.chartService.stockData(stockSym,this.period)
         .subscribe(result=>{
           let tempDataList = [];
@@ -86,8 +93,10 @@ export class ChartComponent implements OnInit {
             labels: this.labalNameList,
             datasets: this.datasetsList
           };
+          this.chartMessage = '';
         },
         error=>{
+          this.chartMessage = 'Error on displaying chart.\n Please refresh Browser';
           console.log(error);
         })
   }
@@ -98,6 +107,12 @@ export class ChartComponent implements OnInit {
       this.recentStock.splice(itemIndex,1);
       localStorage.setItem('recent_stock',JSON.stringify(this.recentStock));
     }
+    this.chartMessage = 'Loading';
+    this.getStockData(this.recentStock,this.period);
+  }
+
+  changePeriod(event:any){
+    this.period = event.target.value;
     this.getStockData(this.recentStock,this.period);
   }
 }

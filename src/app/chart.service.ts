@@ -9,7 +9,7 @@ export class ChartService {
   constructor(private http:Http) { }
 
   stockData(symbol:string,period:string){
-    let url = `http://127.0.0.1:4444/api/finance/${symbol}?period=${period}`;
+    let url = `/api/finance/${symbol}?period=${period}`;
     return this.http.get(url)
                     .map(res=>res.json());
   }

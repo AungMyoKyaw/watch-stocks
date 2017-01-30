@@ -3,17 +3,31 @@
     <chart [type]="type" [data]="data" [options]="options" style="height:40em"></chart>
   </div>
   <form>
-    <div class="form-group">
-      <input #stockSym type="text" (keyup.enter)="addToChart(stockSym.value)" class="form-control" placeholder="Enter Stock Symbol">
+    <div class="form-group col-md-10">
+      <input #stockSym type="text" (keyup.enter)="addToChart(stockSym.value); stockSym.value=''" class="form-control" placeholder="Enter Stock Symbol">
+    </div>
+    <div class="form-group col-md-2">
+      <select class="form-control" (change)="changePeriod($event)">
+        <option value="yr">One Year</option>
+        <option value="sm">Six Months</option>
+        <option value="tm" selected="selected">Three Months</option>
+        <option value="om">One Month</option>
+        <option value="w">One Week</option>
+      </select>
     </div>
   </form>
   <div class="row">
-    <div *ngFor="let stock of recentStock" class="col-sm-4">
-      <div class="recentStockList">
-        <h2 class="text-center text-info">
-          {{stock}}
-          <div (click)="removeFromChart(stock)" class="text-danger" id="delete">X</div>
-        </h2>
+    <div class="col-xs-12">
+      <div *ngIf="chartMessage" class="alert alert-warning chartMes">
+        {{chartMessage}}
+      </div>
+      <div *ngFor="let stock of recentStock" class="col-sm-4">
+        <div class="recentStockList">
+          <h2 class="text-center text-info">
+            {{stock}}
+            <div (click)="removeFromChart(stock)" class="text-danger" id="delete">X</div>
+          </h2>
+        </div>
       </div>
     </div>
   </div>
