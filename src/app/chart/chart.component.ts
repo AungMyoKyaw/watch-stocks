@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ChartService } from '../chart.service';
 
+import * as io from "socket.io-client";
+
 @Component({
   selector: 'app-chart',
   templateUrl: './chart.component.html',
@@ -24,19 +26,27 @@ export class ChartComponent implements OnInit {
   constructor(private chartService:ChartService) { }
 
   ngOnInit() {
-    this.recentStock = this.chartService.getrecentStockSym();
-    if(this.recentStock.length){
-      this.getStockData(this.recentStock,this.period);
-    } else {
-      this.chartMessage = 'No recent stock chart to display!';
-      this.labalNameList = []
-      this.data = {
-        labels: [],
-        datasets: []
-      };
-      this.datasetsList = [];
-      this.labalNameList = [];
-    }
+    this.creatingChart();
+  }
+
+  creatingChart(){
+    let socket = io.connect('/');
+    socket.on('news',(data)=>{
+      console.log(data,'socket data');
+      this.recentStock = data;
+      if(this.recentStock.length){
+        this.getStockData(this.recentStock,this.period);
+      } else {
+        this.chartMessage = 'No recent stock chart to display!';
+        this.labalNameList = []
+        this.data = {
+          labels: [],
+          datasets: []
+        };
+        this.datasetsList = [];
+        this.labalNameList = [];
+      }
+    })
   }
 
   getStockData(recentStock:string[],period:string){
@@ -74,8 +84,12 @@ export class ChartComponent implements OnInit {
                };
             },
             error=>{
-              this.chartMessage = 'Error on displaying chart.\n Please refresh Browser';
-              console.log(error)
+              this.chartMessage = 'Error on displaying chart. Please refresh Browser';
+              if(error.status==500){
+                let index = this.recentStock.indexOf(element);
+                this.recentStock.splice(index,1);
+                this.chartService.removeSliently(element);
+              }
             });
       });
     } else {
@@ -83,61 +97,16 @@ export class ChartComponent implements OnInit {
       this.labalNameList = [];
       this.data = {};
     }
-
   }
 
   addToChart(stockSym:string){
     this.chartMessage = 'Loading';
-    this.chartService.stockData(stockSym,this.period)
-        .subscribe(result=>{
-          let tempDataList = [];
-          let tempLabalNameList = [];
-          result.data.forEach(elem=>{
-            tempDataList.push(Number(elem.Adj_Close));
-             tempLabalNameList.push(elem.Date)
-          });
-          this.datasetsList.push({
-            "label":stockSym,
-            "data":tempDataList.reverse(),
-            "fill":false,
-            "borderColor":this.chartService.randomColor(),
-            "pointRadius":2,
-            "borderWidth":4
-          });
-          this.labalNameList = tempLabalNameList.reverse();
-          this.data = {
-            labels: this.labalNameList,
-            datasets: this.datasetsList
-          };
-          this.chartService.addToRecentStockSym(stockSym);
-          this.recentStock.push(stockSym);
-          this.chartMessage = '';
-        },
-        error=>{
-          this.chartMessage = 'Error on displaying chart.\n Please refresh Browser';
-          console.log(error);
-        })
+    this.chartService.addToRecentStockSym(stockSym);
   }
 
   removeFromChart(sym:string){
-    let itemIndex = this.recentStock.indexOf(sym);
-    if(itemIndex>-1){
-      this.recentStock.splice(itemIndex,1);
-      localStorage.setItem('recent_stock',JSON.stringify(this.recentStock));
-    }
-    if(this.recentStock.length){
-      this.chartMessage = 'Loading';
-      this.getStockData(this.recentStock,this.period);
-    } else {
-      this.chartMessage = 'No recent stock chart to display!';
-      this.labalNameList = []
-      this.data = {
-        labels: [],
-        datasets: []
-      };
-      this.datasetsList = [];
-      this.labalNameList = [];
-    }
+    this.chartMessage = 'Loading';
+    this.chartService.removeFromRecentList(sym);
   }
 
   changePeriod(event:any){

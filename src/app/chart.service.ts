@@ -2,9 +2,11 @@ import { Injectable } from '@angular/core';
 import { Http } from '@angular/http';
 import 'rxjs/add/operator/map';
 
+import * as io from 'socket.io-client';
+
 @Injectable()
 export class ChartService {
-  recentStock:any;
+  recentStock:string[];
 
   constructor(private http:Http) { }
 
@@ -14,27 +16,20 @@ export class ChartService {
                     .map(res=>res.json());
   }
 
-  getrecentStockSym(){
-    this.recentStock = localStorage.getItem('recent_stock');
-    if(this.recentStock==undefined){
-      this.recentStock = ['aapl','fb'];
-      localStorage.setItem('recent_stock',JSON.stringify(this.recentStock));
-    } else {
-      this.recentStock = JSON.parse(this.recentStock);
-    }
-    return this.recentStock;
+  removeFromRecentList(sym:string){
+    let socket = io.connect('/');
+    socket.emit('rm_from_r_s',sym);
   }
 
   addToRecentStockSym(sym:string){
-    this.recentStock = localStorage.getItem('recent_stock');
-    if(this.recentStock==undefined){
-      this.recentStock = [];
-    } else {
-      this.recentStock = JSON.parse(this.recentStock);
-    }
-    this.recentStock.push(sym);
-    localStorage.setItem('recent_stock',JSON.stringify(this.recentStock));
-    return JSON.parse(localStorage.getItem('recent_stock'));
+    let socket = io.connect('/');
+    console.log(sym);
+    socket.emit('add_to_r_s',sym);
+  }
+
+  removeSliently(sym:string){
+    let socket = io.connect('/');
+    socket.emit('rm_sliently',sym);
   }
 
   randomColor(){
